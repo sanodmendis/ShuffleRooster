@@ -47,6 +47,8 @@ def shuffle_and_group_students(input_file='stdlist.csv', output_file='group.csv'
 
             print(f'Redistributed {last_group_size} students from group {last_group}')
 
+        df_shuffled = df_shuffled.sort_values('GROUP').reset_index(drop=True)
+
         df_shuffled.to_csv(output_file, index=False)
         print(f'\nGroups saved to {output_file}')
 
