@@ -29,6 +29,24 @@ def shuffle_and_group_students(input_file='stdlist.csv', output_file='group.csv'
 
         df_shuffled['GROUP'] = [(i // group_size) + 1 for i in range(len(df_shuffled))]
 
+        last_group = df_shuffled['GROUP'].max()
+        last_group_size = len(df_shuffled[df_shuffled['GROUP'] == last_group])
+        min_group_size = (group_size // 2) + 1
+
+        if last_group_size < min_group_size and last_group > 1:
+            print(f'\nLast group has only {last_group_size} students (less than {min_group_size})')
+            print('Redistributing last group members to existing groups...')
+
+            last_group_students = df_shuffled[df_shuffled['GROUP'] == last_group].index.tolist()
+
+            available_groups = list(range(1, last_group))
+
+            for student_idx in last_group_students:
+                new_group = random.choice(available_groups)
+                df_shuffled.loc[student_idx, 'GROUP'] = new_group
+
+            print(f'Redistributed {last_group_size} students from group {last_group}')
+
         df_shuffled.to_csv(output_file, index=False)
         print(f'\nGroups saved to {output_file}')
 
