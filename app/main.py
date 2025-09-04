@@ -5,6 +5,7 @@ import math
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 from tkinter import ttk
+import tkinter as tk
 from PIL import Image
 import os
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
@@ -49,9 +50,23 @@ class mainWindow:
         
         ctk.CTkLabel(group_frame, text='Students per group:').pack(side='left', padx=20, pady=15)
         
-        self.group_size_var = ctk.StringVar(value='4')
-        self.group_size_entry = ctk.CTkEntry(group_frame, textvariable=self.group_size_var, width=100)
-        self.group_size_entry.pack(side='left', padx=10, pady=15)
+        self.group_size_var = tk.IntVar(value=4)
+        self.group_size_spinbox = tk.Spinbox(
+            group_frame, 
+            from_=1, 
+            to=100, 
+            textvariable=self.group_size_var, 
+            width=10,
+            font=('Arial', 12),
+            bg='#2b2b2b',
+            fg='white',
+            buttonbackground='#404040',
+            readonlybackground='#2b2b2b',
+            selectbackground='#1f538d',
+            insertbackground='white'
+        )
+        self.group_size_spinbox.pack(side='left', padx=10, pady=15)
+        
         run_image = ctk.CTkImage(Image.open('app/_internal/run.png'), size=(20, 20))
         create_groups_btn = ctk.CTkButton(group_frame, text='Create Groups', image=run_image, command=self.create_groups)
         create_groups_btn.pack(side='right', padx=20, pady=15)
@@ -115,6 +130,9 @@ class mainWindow:
                 filename = os.path.basename(file_path)
                 self.file_label.configure(text=f'File: {filename}')
                 self.student_info_label.configure(text=f'Loaded {len(self.df)} students')
+                
+                max_students = len(self.df)
+                self.group_size_spinbox.config(to=max_students)
         
                 self.update_treeview(self.df)
         
@@ -126,15 +144,10 @@ class mainWindow:
             mb.showwarning('Warning', 'Please select a file first')
             return
         
-        try:
-            group_size = int(self.group_size_var.get())
-    
-            if group_size <= 0 or group_size > len(self.df):
-                mb.showerror('Error', f'Group size must be between 1 and {len(self.df)}')
-                return
-    
-        except ValueError:
-            mb.showerror('Error', 'Please enter a valid number for group size')
+        group_size = self.group_size_var.get()
+
+        if group_size <= 0 or group_size > len(self.df):
+            mb.showerror('Error', f'Group size must be between 1 and {len(self.df)}')
             return
         
         df_shuffled = self.df.sample(frac=1, random_state=random.randint(1, 10000)).reset_index(drop=True)
