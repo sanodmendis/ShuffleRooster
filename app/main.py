@@ -5,6 +5,7 @@ import math
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 from tkinter import ttk
+from PIL import Image
 import os
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
@@ -36,7 +37,8 @@ class mainWindow:
         
         self.file_label = ctk.CTkLabel(file_frame, text='No file selected')
         self.file_label.pack(side='left', padx=20, pady=15)
-        select_file_btn = ctk.CTkButton(file_frame, text='Select File', command=self.select_file)
+        open_image = ctk.CTkImage(Image.open('app/_internal/open.png'), size=(20, 20))
+        select_file_btn = ctk.CTkButton(file_frame, text='Select File', image=open_image, command=self.select_file)
         select_file_btn.pack(side='right', padx=20, pady=15)
         
         self.student_info_label = ctk.CTkLabel(main_frame, text='')
@@ -50,7 +52,8 @@ class mainWindow:
         self.group_size_var = ctk.StringVar(value='4')
         self.group_size_entry = ctk.CTkEntry(group_frame, textvariable=self.group_size_var, width=100)
         self.group_size_entry.pack(side='left', padx=10, pady=15)
-        create_groups_btn = ctk.CTkButton(group_frame, text='Create Groups', command=self.create_groups)
+        run_image = ctk.CTkImage(Image.open('app/_internal/run.png'), size=(20, 20))
+        create_groups_btn = ctk.CTkButton(group_frame, text='Create Groups', image=run_image, command=self.create_groups)
         create_groups_btn.pack(side='right', padx=20, pady=15)
         
         tree_frame = ctk.CTkFrame(main_frame)
