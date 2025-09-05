@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import pandas as pd
 import random
-import math
 import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 from tkinter import ttk
@@ -39,7 +38,7 @@ class mainWindow:
         self.file_label = ctk.CTkLabel(file_frame, text='No file selected')
         self.file_label.pack(side='left', padx=20, pady=15)
         open_image = ctk.CTkImage(Image.open('app/_internal/open.png'), size=(20, 20))
-        select_file_btn = ctk.CTkButton(file_frame, text='Select File', image=open_image, command=self.select_file)
+        select_file_btn = ctk.CTkButton(file_frame, text='Select File', image=open_image, command=self.select_file, height=35)
         select_file_btn.pack(side='right', padx=20, pady=15)
         
         self.student_info_label = ctk.CTkLabel(main_frame, text='')
@@ -67,8 +66,12 @@ class mainWindow:
         )
         self.group_size_spinbox.pack(side='left', padx=10, pady=15)
         
+        self.shuffle_var = ctk.BooleanVar(value=True)
+        shuffle_checkbox = ctk.CTkCheckBox(group_frame, text="Shuffle", variable=self.shuffle_var)
+        shuffle_checkbox.pack(side='left', padx=10, pady=15)
+        
         run_image = ctk.CTkImage(Image.open('app/_internal/run.png'), size=(20, 20))
-        create_groups_btn = ctk.CTkButton(group_frame, text='Create Groups', image=run_image, command=self.create_groups)
+        create_groups_btn = ctk.CTkButton(group_frame, text='Create Groups', image=run_image, command=self.create_groups, height=35)
         create_groups_btn.pack(side='right', padx=20, pady=15)
         
         tree_frame = ctk.CTkFrame(main_frame)
@@ -83,15 +86,16 @@ class mainWindow:
 
         button_frame = ctk.CTkFrame(main_frame)
         button_frame.pack(fill='x', padx=20, pady=10)
-        save_frame = ctk.CTkFrame(button_frame)
-        save_frame.pack(pady=15)
+        save_frame = ctk.CTkFrame(button_frame, height=75)
+        save_frame.pack(pady=5)
         ctk.CTkLabel(save_frame, text='Save as:').pack(side='left', padx=(10, 5), pady=15)
         self.save_format_var = ctk.StringVar(value='CSV')
         self.save_menu = ctk.CTkOptionMenu(
             save_frame,
             values=['CSV', 'Excel (XLSX)', 'Excel (XLS)', 'PDF'],
             variable=self.save_format_var,
-            command=self.save_groups
+            command=self.save_groups,
+            height=35
         )
         self.save_menu.pack(side='left', padx=10, pady=15)
         
@@ -150,7 +154,11 @@ class mainWindow:
             mb.showerror('Error', f'Group size must be between 1 and {len(self.df)}')
             return
         
-        df_shuffled = self.df.sample(frac=1, random_state=random.randint(1, 10000)).reset_index(drop=True)
+        if self.shuffle_var.get():
+            df_shuffled = self.df.sample(frac=1, random_state=random.randint(1, 10000)).reset_index(drop=True)
+        else:
+            df_shuffled = self.df.copy()
+            
         df_shuffled['GROUP'] = [(i // group_size) + 1 for i in range(len(df_shuffled))]
         
         last_group = df_shuffled['GROUP'].max()
