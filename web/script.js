@@ -26,6 +26,7 @@ class ShuffleRooster {
         this.notification = document.getElementById('notification');
         this.numberUp = document.querySelector('.number-up');
         this.numberDown = document.querySelector('.number-down');
+        this.shuffleSwitch = document.getElementById('shuffleSwitch');
     }
 
     bindEvents() {
@@ -228,14 +229,19 @@ class ShuffleRooster {
             return;
         }
 
-        const shuffledData = [...this.data].sort(() => Math.random() - 0.5);
+        const shouldShuffle = this.shuffleSwitch.checked;
+        let processedData = [...this.data];
         
-        shuffledData.forEach((student, index) => {
+        if (shouldShuffle) {
+            processedData = processedData.sort(() => Math.random() - 0.5);
+        }
+        
+        processedData.forEach((student, index) => {
             student.GROUP = Math.floor(index / groupSize) + 1;
         });
 
-        const lastGroup = Math.max(...shuffledData.map(s => s.GROUP));
-        const lastGroupStudents = shuffledData.filter(s => s.GROUP === lastGroup);
+        const lastGroup = Math.max(...processedData.map(s => s.GROUP));
+        const lastGroupStudents = processedData.filter(s => s.GROUP === lastGroup);
         const minGroupSize = Math.floor(groupSize / 2) + 1;
 
         if (lastGroupStudents.length < minGroupSize && lastGroup > 1) {
@@ -246,7 +252,7 @@ class ShuffleRooster {
             });
         }
 
-        this.groupedData = shuffledData.sort((a, b) => a.GROUP - b.GROUP);
+        this.groupedData = processedData.sort((a, b) => a.GROUP - b.GROUP);
         
         const numGroups = Math.max(...this.groupedData.map(s => s.GROUP));
         this.studentInfo.textContent = `Created ${numGroups} groups`;
@@ -262,7 +268,7 @@ class ShuffleRooster {
         }
 
         const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        const filename = `student_groups_${timestamp}`;
+        const filename = `grouped_${timestamp}`;
 
         if (this.currentFormat === 'csv') {
             this.downloadCSV(filename);
